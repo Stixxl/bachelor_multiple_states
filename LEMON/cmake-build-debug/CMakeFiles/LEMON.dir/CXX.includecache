@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/corbinian/Documents/University/WS17_18/Bachelorthesis/multiple_states/LEMON/main.cpp
+iostream
+-
+fstream
+-
+vector
+-
+lemon/smart_graph.h
+-
+

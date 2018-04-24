@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/LEMON.dir/main.cpp.o  -o LEMON 
