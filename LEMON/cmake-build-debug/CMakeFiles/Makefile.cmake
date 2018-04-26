@@ -45,6 +45,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/lemon.dir/DependInfo.cmake"
   "CMakeFiles/LEMON.dir/DependInfo.cmake"
+  "CMakeFiles/lemon.dir/DependInfo.cmake"
+  "CMakeFiles/lglpk.dir/DependInfo.cmake"
   )

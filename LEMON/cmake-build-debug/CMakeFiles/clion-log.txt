@@ -1,7 +1,10 @@
 /home/corbinian/Programs/clion-2018.1.1/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/corbinian/Documents/University/WS17_18/Bachelorthesis/multiple_states/LEMON
 You have called ADD_LIBRARY for library lemon without any source files. This typically indicates a problem with your CMakeLists.txt file
+You have called ADD_LIBRARY for library lglpk without any source files. This typically indicates a problem with your CMakeLists.txt file
 -- Configuring done
 CMake Error: Cannot determine link language for target "lemon".
 CMake Error: CMake can not determine linker language for target: lemon
+CMake Error: Cannot determine link language for target "lglpk".
+CMake Error: CMake can not determine linker language for target: lglpk
 -- Generating done
 -- Build files have been written to: /home/corbinian/Documents/University/WS17_18/Bachelorthesis/multiple_states/LEMON/cmake-build-debug

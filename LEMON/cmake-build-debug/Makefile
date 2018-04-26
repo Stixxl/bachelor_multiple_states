@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named LEMON
+
+# Build rule for target.
+LEMON: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 LEMON
+.PHONY : LEMON
+
+# fast build rule for target.
+LEMON/fast:
+	$(MAKE) -f CMakeFiles/LEMON.dir/build.make CMakeFiles/LEMON.dir/build
+.PHONY : LEMON/fast
+
+#=============================================================================
 # Target rules for targets named lemon
 
 # Build rule for target.
@@ -124,17 +137,17 @@ lemon/fast:
 .PHONY : lemon/fast
 
 #=============================================================================
-# Target rules for targets named LEMON
+# Target rules for targets named lglpk
 
 # Build rule for target.
-LEMON: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 LEMON
-.PHONY : LEMON
+lglpk: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 lglpk
+.PHONY : lglpk
 
 # fast build rule for target.
-LEMON/fast:
-	$(MAKE) -f CMakeFiles/LEMON.dir/build.make CMakeFiles/LEMON.dir/build
-.PHONY : LEMON/fast
+lglpk/fast:
+	$(MAKE) -f CMakeFiles/lglpk.dir/build.make CMakeFiles/lglpk.dir/build
+.PHONY : lglpk/fast
 
 main.o: main.cpp.o
 
@@ -170,9 +183,10 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... edit_cache"
-	@echo "... lemon"
 	@echo "... LEMON"
+	@echo "... lemon"
+	@echo "... lglpk"
+	@echo "... edit_cache"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

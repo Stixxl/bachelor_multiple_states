@@ -203,6 +203,9 @@ ProcessorCount_cmd_sysctl:FILEPATH=/sbin/sysctl
 //Dependencies for target
 lemon_LIB_DEPENDS:STATIC=
 
+//Dependencies for target
+lglpk_LIB_DEPENDS:STATIC=
+
 
 ########################
 # INTERNAL cache entries
