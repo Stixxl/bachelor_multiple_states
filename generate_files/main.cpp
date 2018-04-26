@@ -33,7 +33,7 @@ void generate_test(int testnumber, int amount_servers, int amount_demands, int m
         vector<vector<unsigned long>> cr;
         total_amount_servers += amount_per_server;
         int amount_lower = (rand() % max_lower) + 1;
-        for (int k = 0; k != amount_lower; ++k) {
+        for (int k = 0; k != amount_lower + 1; ++k) {
             vector<unsigned long> crk;
             if(k != 0) {
                 tc.push_back((rand() % max_transition) + 1);
@@ -43,7 +43,7 @@ void generate_test(int testnumber, int amount_servers, int amount_demands, int m
             if (k == 0) {
                 consumption_rate = (rand() % (max_consumption - amount_lower)) + amount_lower;
             } else {
-                consumption_rate = (rand() % (cr[k-1][j] - amount_lower)) + amount_lower;
+                consumption_rate = (rand() % (cr[k-1][j] - amount_lower + k)) + amount_lower - k;
         }
         crk.push_back(consumption_rate);
         }
@@ -74,8 +74,8 @@ void generate_test(int testnumber, int amount_servers, int amount_demands, int m
         }
     }
 
-    printf("Creating an test instance with %d servers and %d timesteps; max transition cost %d; max consumption rate: %d; max servers per class: %d",
-           amount_servers, amount_demands, max_transition, max_consumption, max_per_server);
+    printf("Creating an test instance with %d servers and %d timesteps; max transition cost %d; max consumption rate: %d; max servers per class: %d; maxi amount lower paths %d",
+           amount_servers, amount_demands, max_transition, max_consumption, max_per_server, max_lower);
     file.close();
 
 }
