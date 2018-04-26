@@ -321,7 +321,7 @@ void read_test_file(const string &name, vector<Server> &servers, vector<unsigned
             }
                 consumption_rate.emplace_back(cr);
             }
-            servers.emplace_back(Server(consumption_rate, tc, amount_servers));
+            servers.emplace_back(Server(consumption_rate, tc, amount_per_server));
         }
         file.close();
     } else cout << "Unable to open file " << name;
@@ -347,7 +347,7 @@ int main() {
     vector<unsigned long> transition_cost {2,4};
     server = Server(consumption_rate, transition_cost, 3);
     servers.push_back(server);*/
-    read_test_file("tests/test_0", servers, demands);
+    read_test_file("tests/test", servers, demands);
     generate_graph(g, imbalances1, imbalances2, cost, capacity, capacity1, capacity2, servers, demands);
     print_graph(g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
     double min_cost = mcmcf(g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
