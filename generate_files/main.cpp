@@ -17,12 +17,10 @@ struct Server {
     }
 };
 
-void generate_test(int testnumber, int max_servers, int max_demands, int max_transition, int max_consumption, int max_per_server, int max_lower) {
+void generate_test(int testnumber, int amount_servers, int amount_demands, int max_transition, int max_consumption, int max_per_server, int max_lower) {
     ofstream file;
     file.open("tests/test_" + to_string(testnumber));
     srand(time(NULL));
-    int amount_servers = (rand() % max_servers) + 1;
-    int amount_demands = (rand() % max_demands) + 1;
     int total_amount_servers = 0;
 
     vector<unsigned int> demands;
@@ -42,10 +40,10 @@ void generate_test(int testnumber, int max_servers, int max_demands, int max_tra
             }
         for (int j = 0; j != amount_demands; ++j) {
                 int consumption_rate;
-            if (j == 0) {
-                consumption_rate = (rand() % (max_consumption - amount_lower) + amount_lower;
+            if (k == 0) {
+                consumption_rate = (rand() % (max_consumption - amount_lower)) + amount_lower;
             } else {
-                consumption_rate = (rand() % (crk[j-1] - amount_lower)) + amount_lower;
+                consumption_rate = (rand() % (cr[k-1][j] - amount_lower)) + amount_lower;
         }
         crk.push_back(consumption_rate);
         }
@@ -62,13 +60,18 @@ void generate_test(int testnumber, int max_servers, int max_demands, int max_tra
     {
         file << *it_demands << " ";
     }
-    file << std::endl;
     for(auto it_servers = servers.begin(); it_servers != servers.end(); ++it_servers) {
-        file << it_servers->amount_servers << " " << it_servers->transition_costs << std::endl;
+        file << std::endl;
+        file << it_servers->amount_servers << " " << it_servers->transition_costs.size() << std::endl;
         for(auto it_transition_costs = it_servers->transition_costs.begin(); it_transition_costs != it_servers->transition_costs.end(); ++it_transition_costs) {
          file << *it_transition_costs << " ";
         }
-        file << std::endl;
+        for(auto it_consumption_rates = it_servers->consumption_rate.begin(); it_consumption_rates != it_servers->consumption_rate.end(); ++it_consumption_rates) {
+            file << std::endl;
+            for(auto it_consumption_rate = it_consumption_rates->begin(); it_consumption_rate != it_consumption_rates->end(); ++it_consumption_rate) {
+                file << *it_consumption_rate << " ";
+            }
+        }
     }
 
     printf("Creating an test instance with %d servers and %d timesteps; max transition cost %d; max consumption rate: %d; max servers per class: %d",
