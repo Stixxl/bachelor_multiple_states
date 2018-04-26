@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include <lemon/smart_graph.h>
 
 #include<lemon/glpk.h>
@@ -159,7 +160,7 @@ void generate_graph(SmartDigraph &g, SmartDigraph::NodeMap<long> &imbalances1, S
         capacity.set(edge, it_servers->amount_servers);
         capacity1.set(edge, it_servers->amount_servers);
         capacity2.set(edge, 0);
-        cost.set(edge, it_servers->consumption_rate[0][it_servers->consumption_rate.size()-1]);
+        cost.set(edge, it_servers->consumption_rate[0][it_servers->consumption_rate[0].size()-1]);
 
         edge = g.addArc(old_l[old_l.size()-1], l_kn);
         capacity.set(edge, it_servers->amount_servers);
@@ -245,23 +246,85 @@ const SmartDigraph::ArcMap<unsigned long> &capacity2, SmartDigraph::ArcMap<unsig
     lp.solve();
     switch(lp.primalType()) {
         case Lp::ProblemType::UNBOUNDED:
-            cout << "UNBOUNDED" << std::endl;
+            cerr << "UNBOUNDED" << std::endl;
             break;
         case Lp::ProblemType::OPTIMAL:
-            cout << "OPTIMAL" << std::endl;
+            cerr << "OPTIMAL" << std::endl;
                 break;
         case Lp::ProblemType::INFEASIBLE:
-            cout << "INFEASIBLE" << std::endl;
+            cerr << "INFEASIBLE" << std::endl;
             break;
         case Lp::ProblemType::FEASIBLE:
-            cout << "FEASIBLE" << std::endl;
+            cerr << "FEASIBLE" << std::endl;
             break;
         case Lp::ProblemType::UNDEFINED:
-            cout << "UNDEFINED" << std::endl;
+            cerr << "UNDEFINED" << std::endl;
             break;
     }
 
     return lp.primal();
+}
+
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        *(result++) = item;
+    }
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
+
+void read_test_file(const string &name, vector<Server> &servers, vector<unsigned long> &demands) {
+    string line;
+    ifstream file(name);
+    if (file.is_open()) {
+        getline(file, line);
+        vector<string> buffer = split(line, ' ');
+        long amount_servers = stol(buffer[0]);
+        long amount_demands = stol(buffer[1]);
+
+        getline(file, line);
+        buffer = split(line, ' ');
+        for (auto it = buffer.begin(); it != buffer.end(); ++it) {
+            if (!(*it).empty()) {
+                demands.emplace_back(stol(*it));
+            }
+        }
+        for (int i = 0; i != amount_servers; ++i) {
+            getline(file, line);
+            buffer = split(line, ' ');
+            long amount_per_server = stol(buffer[0]);
+            long amount_lower = stol(buffer[1]);
+            getline(file, line);
+            buffer = split(line, ' ');
+            vector<unsigned long> tc;
+            for(auto it = buffer.begin(); it != buffer.end(); ++it) {
+                if(!(*it).empty()) {
+                    tc.emplace_back(stol(*it));
+                }
+            }
+            vector<vector<unsigned long>> consumption_rate;
+            for (int i = 0; i != amount_lower + 1; ++i) {
+                getline(file, line);
+                buffer = split(line, ' ');
+                vector<unsigned long> cr;
+                for (auto it = buffer.begin(); it != buffer.end(); ++it) {
+                if (!(*it).empty()) {
+                    cr.emplace_back(stol(*it));
+                }
+            }
+                consumption_rate.emplace_back(cr);
+            }
+            servers.emplace_back(Server(consumption_rate, tc, amount_servers));
+        }
+        file.close();
+    } else cout << "Unable to open file " << name;
 }
 int main() {
     SmartDigraph g;
@@ -273,18 +336,18 @@ int main() {
     SmartDigraph::ArcMap<unsigned long> cost(g);
 
     vector<Server> servers;
-    vector<unsigned long> demands {1,4};
+    vector<unsigned long> demands; /*{1,4};
 
-    vector<vector<unsigned long>> cr {{3,3,3},{2,2,2},{1,1,1}};
+    vector<vector<unsigned long>> cr {{3,3},{2,2},{1,1}};
     vector<unsigned long> tc {1,2};
     Server server = Server(cr, tc, 3);
     servers.push_back(server);
 
-    vector<vector<unsigned long>> consumption_rate {{5,5,5},{3,3,3},{1,1,1}};
+    vector<vector<unsigned long>> consumption_rate {{5,5},{3,3},{1,1}};
     vector<unsigned long> transition_cost {2,4};
     server = Server(consumption_rate, transition_cost, 3);
-    servers.push_back(server);
-
+    servers.push_back(server);*/
+    read_test_file("tests/test_0", servers, demands);
     generate_graph(g, imbalances1, imbalances2, cost, capacity, capacity1, capacity2, servers, demands);
     print_graph(g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
     double min_cost = mcmcf(g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);

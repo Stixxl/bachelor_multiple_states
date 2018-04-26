@@ -37,8 +37,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+            <state relative-caret-position="433">
+              <caret line="349" column="53" selection-start-line="349" selection-start-column="53" selection-end-line="349" selection-end-column="53" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -60,6 +60,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>int</find>
+      <find>consumption_rate</find>
     </findStrings>
     <replaceStrings>
       <replace>long</replace>
@@ -84,7 +85,7 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="29" />
-    <option name="width" value="960" />
+    <option name="width" value="640" />
     <option name="height" value="1051" />
   </component>
   <component name="ProjectView">
@@ -138,18 +139,18 @@
       <updated>1524563923590</updated>
       <workItem from="1524563925619" duration="10694000" />
       <workItem from="1524644772475" duration="715000" />
-      <workItem from="1524650747336" duration="12530000" />
+      <workItem from="1524650747336" duration="17521000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23939000" />
+    <option name="totallyTimeSpent" value="28930000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="29" width="960" height="1051" extended-state="0" />
+    <frame x="0" y="29" width="640" height="1051" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.082635984" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12421384" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info active="true" anchor="bottom" id="Messages" order="7" visible="true" weight="0.32879582" />
       <window_info anchor="bottom" id="CMake" order="7" weight="0.32984293" />
@@ -231,8 +232,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        <state relative-caret-position="433">
+          <caret line="349" column="53" selection-start-line="349" selection-start-column="53" selection-end-line="349" selection-end-column="53" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
