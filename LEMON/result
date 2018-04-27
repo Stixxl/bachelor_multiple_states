@@ -1,0 +1,26 @@
+1 & 35 & 60 & \SI{69}{\nano\second} & \SI{2263}{\nano\second} & \SI{2332}{\nano\second}\\
+\hline
+2 & 74 & 146 & \SI{46}{\nano\second} & \SI{5423}{\nano\second} & \SI{5469}{\nano\second}\\
+\hline
+3 & 95 & 194 & \SI{46}{\nano\second} & \SI{4732}{\nano\second} & \SI{4778}{\nano\second}\\
+\hline
+4 & 183 & 404 & \SI{42}{\nano\second} & \SI{12741}{\nano\second} & \SI{12783}{\nano\second}\\
+\hline
+5 & 886 & 2218 & \SI{124}{\nano\second} & \SI{308068}{\nano\second} & \SI{308192}{\nano\second}\\
+\hline
+6 & 991 & 2508 & \SI{145}{\nano\second} & \SI{366444}{\nano\second} & \SI{366589}{\nano\second}\\
+\hline
+7 & 12082 & 32876 & \SI{2379}{\nano\second} & \SI{75134977}{\nano\second} & \SI{75137356}{\nano\second}\\
+\hline
+8 & 14119 & 39148 & \SI{2284}{\nano\second} & \SI{113638698}{\nano\second} & \SI{113640982}{\nano\second}\\
+\hline
+9 & 5093 & 13794 & \SI{681}{\nano\second} & \SI{10956674}{\nano\second} & \SI{10957355}{\nano\second}\\
+\hline
+10 & 9111 & 25358 & \SI{1379}{\nano\second} & \SI{36146060}{\nano\second} & \SI{36147439}{\nano\second}\\
+\hline
+11 & 16808 & 46674 & \SI{2639}{\nano\second} & \SI{171663817}{\nano\second} & \SI{171666456}{\nano\second}\\
+\hline
+12 & 27245 & 77250 & \SI{4737}{\nano\second} & \SI{527230130}{\nano\second} & \SI{527234867}{\nano\second}\\
+\hline
+13 & 32546 & 90858 & \SI{4974}{\nano\second} & \SI{780264000}{\nano\second} & \SI{780268974}{\nano\second}\\
+\hline

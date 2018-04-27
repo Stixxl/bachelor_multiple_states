@@ -7,6 +7,10 @@
 #include<lemon/glpk.h>
 #include<lemon/lp.h>
 
+#include<ctime>
+#include<sys/timeb.h>
+#include<cinttypes>
+
 using namespace std;
 using namespace lemon;
 
@@ -193,7 +197,7 @@ void print_graph(const SmartDigraph &g, const SmartDigraph::ArcMap<unsigned long
 }
 
 
-double mcmcf(const SmartDigraph &g, const SmartDigraph::ArcMap<unsigned long> &capacity, const SmartDigraph::ArcMap<unsigned long> &capacity1,
+double mcmcf(bool is_debug, const SmartDigraph &g, const SmartDigraph::ArcMap<unsigned long> &capacity, const SmartDigraph::ArcMap<unsigned long> &capacity1,
 const SmartDigraph::ArcMap<unsigned long> &capacity2, SmartDigraph::ArcMap<unsigned long> &cost, SmartDigraph::NodeMap<long> &imbalances1,
              SmartDigraph::NodeMap<long> &imbalances2)
 {
@@ -262,6 +266,12 @@ const SmartDigraph::ArcMap<unsigned long> &capacity2, SmartDigraph::ArcMap<unsig
             break;
     }
 
+    if(is_debug) {
+        for(SmartDigraph::ArcIt a(g); a != INVALID; ++a) {
+            cout << g.id(g.source(a)) << " " << g.id(g.target(a)) << ": " << f1[a] << " " << f2[a];
+        }
+    }
+
     return lp.primal();
 }
 
@@ -326,7 +336,67 @@ void read_test_file(const string &name, vector<Server> &servers, vector<unsigned
         file.close();
     } else cout << "Unable to open file " << name;
 }
-int main() {
+
+uint64_t getTimeNow() {
+    timespec ts{};
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return (uint64_t) ts.tv_sec * 1000000LL + (uint64_t) ts.tv_nsec / 1000LL;
+}
+
+void benchmark(int filenumber, uint64_t &generate, uint64_t &flow, string output) {
+    srand(time(NULL));
+    vector<Server> servers;
+    vector<unsigned long> demands;
+    read_test_file("tests/test_" + to_string(filenumber), servers, demands);
+    ofstream file;
+    ofstream data_file;
+    file.open(output, std::ios_base::app);
+    data_file.open(output + "_data", std::ios_base::app);
+    long amount_nodes = 2 * demands.size();
+    long amount_edges = 0;
+
+    for(auto it_servers = servers.begin(); it_servers != servers.end(); ++it_servers) {
+        amount_nodes += (1 + 2 * it_servers->transition_costs.size()) * demands.size() + 1 + it_servers->transition_costs.size();
+        amount_edges += 2 * it_servers->transition_costs.size() * (demands.size() + 1) + (1 + 4 * it_servers->transition_costs.size())
+ * (demands.size() - 1) + 4;
+    }
+
+    SmartDigraph g;
+    SmartDigraph::NodeMap<long> imbalances1(g);
+    SmartDigraph::NodeMap<long> imbalances2(g);
+    SmartDigraph::ArcMap<unsigned long> capacity(g);
+    SmartDigraph::ArcMap<unsigned long> capacity1(g);
+    SmartDigraph::ArcMap<unsigned long> capacity2(g);
+    SmartDigraph::ArcMap<unsigned long> cost(g);
+
+    uint64_t start = getTimeNow();
+    generate_graph(g, imbalances1, imbalances2, cost, capacity, capacity1, capacity2, servers, demands);
+    uint64_t start_flow = getTimeNow();
+
+    double min_cost = mcmcf(false, g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
+    uint64_t end = getTimeNow();
+
+    cout << "Minimal Cost: " << min_cost << std::endl;
+
+    uint64_t generate_bench = (start_flow - start);
+    uint64_t flow_bench = (end - start_flow);
+    uint64_t bench = generate_bench + flow_bench;
+    generate += generate_bench;
+    flow += flow_bench;
+    printf("Generating the graph took %" PRIu64 " nanoseconds.\n", generate_bench);
+    printf("Executing mcmcf took %" PRIu64 " nanoseconds.\n", flow_bench);
+    printf("Overall time required was %" PRIu64 " nanoseconds.\n", bench);
+    file << (filenumber + 1) << " & " << amount_nodes << " & " << amount_edges << " & ";
+    file << "\\SI{" << generate_bench << "}{\\nano\\second} & " << "\\SI{" << flow_bench << "}{\\nano\\second} & "
+         << "\\SI{" << bench << "}{\\nano\\second}\\\\" << std::endl;
+    file << "\\hline" << std::endl;
+    data_file << generate_bench << " & " << flow_bench << " & " << bench << "\\\\" << std::endl;
+    file.close();
+}
+
+int main(int argc, char * argv[]) {
+    /*
+    string testnumber = argv[1];
     SmartDigraph g;
     SmartDigraph::NodeMap<long> imbalances1(g);
     SmartDigraph::NodeMap<long> imbalances2(g);
@@ -336,7 +406,7 @@ int main() {
     SmartDigraph::ArcMap<unsigned long> cost(g);
 
     vector<Server> servers;
-    vector<unsigned long> demands; /*{1,4};
+    vector<unsigned long> demands {1,4};
 
     vector<vector<unsigned long>> cr {{3,3},{2,2},{1,1}};
     vector<unsigned long> tc {1,2};
@@ -346,11 +416,25 @@ int main() {
     vector<vector<unsigned long>> consumption_rate {{5,5},{3,3},{1,1}};
     vector<unsigned long> transition_cost {2,4};
     server = Server(consumption_rate, transition_cost, 3);
-    servers.push_back(server);*/
-    read_test_file("tests/test", servers, demands);
+    servers.push_back(server);
+    read_test_file("tests/test_" + testnumber, servers, demands);
     generate_graph(g, imbalances1, imbalances2, cost, capacity, capacity1, capacity2, servers, demands);
     print_graph(g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
     double min_cost = mcmcf(g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
     cout << "Minimal Cost: " << min_cost << std::endl;
+    */
+    const int amount_tests = stoi(argv[1]);
+
+    uint64_t generate = 0;
+    uint64_t flow = 0;
+    for(int i = 0; i != amount_tests; ++i) {
+        printf("running test %d\n", i);
+        benchmark(i, generate, flow, "result");
+    }
+
+    printf("Ran %d tests.\n", amount_tests);
+    printf("Overall time required for generating the graph: %" PRIu64 " nanoseconds\n", generate);
+    printf("Overall time required for executing the simplex algorithm: %" PRIu64 " nanoseconds\n", flow);
+    printf("Overall time required: %" PRIu64 " nanoseconds\n", generate + flow);
     return 0;
 }
