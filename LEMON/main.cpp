@@ -5,6 +5,7 @@
 #include <lemon/smart_graph.h>
 
 #include<lemon/glpk.h>
+#include<lemon/cplex.h>
 #include<lemon/lp.h>
 
 #include<ctime>
@@ -190,10 +191,45 @@ void print_graph(const SmartDigraph &g, const SmartDigraph::ArcMap<unsigned long
         file << g.id(a) << " [ xlabel=\"" << to_string(imbalances1[a]) << "/" << to_string(imbalances2[a]) << "\" ]" << std::endl;
     }
     for (SmartDigraph::ArcIt a(g); a != INVALID; ++a) {
-        file  << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [fontcolor=red, label=\"" << to_string(cost[a]) << "/" << to_string(capacity[a]) << "/" << to_string(capacity1[a]) << "/" << to_string(capacity2[a]) << "\" ]"
+        file  << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [fontcolor=red, label=\"" << g.id(a) << ":" << to_string(cost[a]) << "/" << to_string(capacity[a]) << "/" << to_string(capacity1[a]) << "/" << to_string(capacity2[a]) << "\" ]"
               << std::endl;
     }
     file << "}" << std::endl;
+}
+
+void print_graph(const SmartDigraph &g, const SmartDigraph::ArcMap<unsigned long> &capacity, const SmartDigraph::ArcMap<unsigned long> &capacity1,
+                 const SmartDigraph::ArcMap<unsigned long> &capacity2, SmartDigraph::ArcMap<unsigned long> &cost, SmartDigraph::NodeMap<long> &imbalances1,
+                 SmartDigraph::NodeMap<long> &imbalances2, SmartDigraph::ArcMap<Lp::Col> &f1, SmartDigraph::ArcMap<Lp::Col> &f2, Lp &lp) {
+    ofstream file;
+    file.open("dot.gv");
+    file << "digraph G {" << std::endl;
+    for (SmartDigraph::NodeIt a(g); a != INVALID; ++a) {
+        file << g.id(a) << " [ xlabel=\"" << to_string(imbalances1[a]) << "/" << to_string(imbalances2[a]) << "\" ]" << std::endl;
+    }
+    for (SmartDigraph::ArcIt a(g); a != INVALID; ++a) {
+        file  << g.id(g.source(a)) << " -> " << g.id(g.target(a)) << " [fontcolor=red, label=\"" << to_string(cost[a])
+              << "|" << to_string(capacity[a]) << "|" << lp.primal(f1[a]) << "/" << to_string(capacity1[a])
+              << "|" << lp.primal(f2[a]) << "/" << to_string(capacity2[a]) << "\" ]"
+              << std::endl;
+    }
+    file << "}" << std::endl;
+}
+
+void scale_flow(unsigned long amount_servers, const SmartDigraph &g, SmartDigraph::ArcMap<unsigned long> &capacity1,
+                SmartDigraph::ArcMap<unsigned long> &cost, SmartDigraph::NodeMap<long> &imbalances1, SmartDigraph::ArcMap<Lp::Col> &f1, Lp &lp) {
+    SmartDigraph::ArcMap<double> flow(g);
+    for(SmartDigraph::ArcIt a(g); a != INVALID; ++a) {
+        flow[a] = lp.primal(f1[a]) * amount_servers;
+        capacity1[a] *= amount_servers;
+    }
+    //only nodes with imbalance1 are a_0 and b_0
+    //TODO: Potentially erronous
+    imbalances1[g.nodeFromId(0)] *= amount_servers;
+    imbalances1[g.nodeFromId(1)] *= amount_servers;
+}
+
+void round_flow_upper() {
+
 }
 
 
@@ -216,7 +252,7 @@ const SmartDigraph::ArcMap<unsigned long> &capacity2, SmartDigraph::ArcMap<unsig
         lp.colLowerBound(f2[a], 0);
         lp.colUpperBound(f2[a], capacity2[a]);
 
-        lp.addRow(f1[a] + f2[a] <= capacity[a]);
+        lp.addRow( f1[a] + f2[a] <= capacity[a]);
         //lp.addRow(0 <= f1[a] + f2[a]); implicitly set since both f1[a] and f2[a] are required to be >= 0
     }
     // Flow conservation constraints
@@ -268,10 +304,10 @@ const SmartDigraph::ArcMap<unsigned long> &capacity2, SmartDigraph::ArcMap<unsig
 
     if(is_debug) {
         for(SmartDigraph::ArcIt a(g); a != INVALID; ++a) {
-            cout << g.id(g.source(a)) << " " << g.id(g.target(a)) << ": " << f1[a] << " " << f2[a];
+            printf("%d: %f %f\n", g.id(a), lp.primal(f1[a]), lp.primal(f2[a]));
         }
+        print_graph(g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2, f1, f2, lp);
     }
-
     return lp.primal();
 }
 
@@ -343,7 +379,7 @@ uint64_t getTimeNow() {
     return (uint64_t) ts.tv_sec * 1000000LL + (uint64_t) ts.tv_nsec / 1000LL;
 }
 
-void benchmark(int filenumber, uint64_t &generate, uint64_t &flow, string output) {
+void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &flow, string output) {
     srand(time(NULL));
     vector<Server> servers;
     vector<unsigned long> demands;
@@ -352,13 +388,13 @@ void benchmark(int filenumber, uint64_t &generate, uint64_t &flow, string output
     ofstream data_file;
     file.open(output, std::ios_base::app);
     data_file.open(output + "_data", std::ios_base::app);
-    long amount_nodes = 2 * demands.size();
+    long amount_nodes = 2 * (demands.size() + 1);
     long amount_edges = 0;
 
     for(auto it_servers = servers.begin(); it_servers != servers.end(); ++it_servers) {
         amount_nodes += (1 + 2 * it_servers->transition_costs.size()) * demands.size() + 1 + it_servers->transition_costs.size();
-        amount_edges += 2 * it_servers->transition_costs.size() * (demands.size() + 1) + (1 + 4 * it_servers->transition_costs.size())
- * (demands.size() - 1) + 4;
+        amount_edges += 5 + 4 * it_servers->transition_costs.size() + (1 + 6 * it_servers->transition_costs.size())
+ * (demands.size() - 1);
     }
 
     SmartDigraph g;
@@ -373,7 +409,7 @@ void benchmark(int filenumber, uint64_t &generate, uint64_t &flow, string output
     generate_graph(g, imbalances1, imbalances2, cost, capacity, capacity1, capacity2, servers, demands);
     uint64_t start_flow = getTimeNow();
 
-    double min_cost = mcmcf(false, g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
+    double min_cost = mcmcf(is_debug, g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2);
     uint64_t end = getTimeNow();
 
     cout << "Minimal Cost: " << min_cost << std::endl;
@@ -429,7 +465,7 @@ int main(int argc, char * argv[]) {
     uint64_t flow = 0;
     for(int i = 0; i != amount_tests; ++i) {
         printf("running test %d\n", i);
-        benchmark(i, generate, flow, "result");
+        benchmark(true, i, generate, flow, "result");
     }
 
     printf("Ran %d tests.\n", amount_tests);
