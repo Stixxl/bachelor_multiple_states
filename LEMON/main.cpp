@@ -228,8 +228,82 @@ void scale_flow(unsigned long amount_servers, const SmartDigraph &g, SmartDigrap
     imbalances1[g.nodeFromId(1)] *= amount_servers;
 }
 
-void round_flow_upper() {
-
+void round_flow_upper(const vector<Server> servers, const unsigned long amnt_timesteps, const SmartDigraph &g, SmartDigraph::ArcMap<unsigned long> &capacity1,
+                      SmartDigraph::ArcMap<unsigned long> &cost, SmartDigraph::NodeMap<long> &imbalances1, SmartDigraph::ArcMap<double> &flow) {
+    //last step does not have to be considered since the flow there is always decreasing
+    unsigned long vertices_counter = 2 * (amnt_timesteps + 1);
+    unsigned long server_counter = 0;
+    double prior_flow = 0.0;
+    bool is_decreasing = false;
+    unsigned long valley_start = 0;
+    unsigned long path_length = 0;
+    double overflow = 0.0;
+    while(server_counter < servers.size()){
+        Server current = servers[server_counter];
+        unsigned long sigma = current.transition_costs.size();
+        unsigned long u_k = vertices_counter;
+        unsigned long u_k1 = vertices_counter + 1 + 2 * sigma;
+        SmartDigraph::Arc edge = findArc(g, g.nodeFromId(u_k), g.nodeFromId(u_k1));
+        if(edge == INVALID) {
+            server_counter++;
+            is_decreasing = false;
+            continue;
+        }
+        else {
+            vertices_counter += 1 + 2 * sigma;//set counter to next u_{i,k +1 }
+            if(flow[edge] > prior_flow && is_decreasing) {
+                unsigned long valley_end = u_k;
+                //TODO Handle flow relocation
+                //TODO handle last timestep appropiately
+                //FIXME Check if it works
+                //find smallest lower path that routes flow
+                unsigned long l_k = valley_start + 1;
+                for(int i = 0; i != current.transition_costs.size(); ++i) {
+                    SmartDigraph::Arc edge = findArc(g, g.nodeFromId(u_k), g.nodeFromId(l_k));
+                    if(flow[edge] > 0) {
+                        break;
+                    } else {
+                        l_k += 2;
+                    }
+                }
+                //route flow to lower path
+                SmartDigraph::Arc edge = findArc(g, g.nodeFromId(valley_start), g.nodeFromId(l_k));
+                flow[edge] -= overflow;
+                u_k = valley_start;
+                u_k1 = valley_start + 1 + 2 * sigma;
+                unsigned long l_ak = l_k + 1;
+                unsigned long l_k1 = l_k + 2 * sigma;
+                for(int i = 0; i != path_length; ++i) {
+                    //remove flow from upper path
+                    SmartDigraph::Arc upper = findArc(g, g.nodeFromId(u_k), g.nodeFromId(u_k1));
+                    flow[upper] -= overflow;
+                    //route flow over lower paths
+                    SmartDigraph::Arc lower = findArc(g, g.nodeFromId(l_k), g.nodeFromId(l_ak);
+                    SmartDigraph::Arc lower1 = findArc(g, g.nodeFromId(l_ak), g.nodeFromId(l_k1));
+                    flow[lower] += overflow;
+                    flow[lower1] += overflow;
+                    l_k = l_k1;
+                    l_ak = l_k + 1;
+                    l_k1 += 2 * sigma;
+                    u_k = u_k1;
+                    u_k1 += 1 + 2 * sigma;
+                }
+                edge = findArc(g, g.nodeFromId(l_k), g.nodeFromId(u_k));
+                flow[edge] += overflow;
+                is_decreasing = false;
+            }
+            else if(flow[edge] < prior_flow) {
+                is_decreasing = true;
+                path_length = 1;
+                valley_start = u_k;
+                overflow = flow[edge] - floor(flow[edge]);
+            }
+            else {
+                path_length++;
+            }
+        }
+        prior_flow = flow[edge];
+    }
 }
 
 
