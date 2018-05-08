@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 using namespace std;
@@ -20,7 +20,7 @@ struct Server {
 void generate_test(int testnumber, int amount_servers, int amount_demands, int max_transition, int max_consumption, int max_per_server, int max_lower) {
     ofstream file;
     file.open("tests/test_" + to_string(testnumber));
-    srand(time(NULL));
+    srand(time(nullptr));
     int total_amount_servers = 0;
 
     vector<unsigned int> demands;
@@ -39,7 +39,7 @@ void generate_test(int testnumber, int amount_servers, int amount_demands, int m
                 tc.push_back((rand() % max_transition) + 1);
             }
         for (int j = 0; j != amount_demands; ++j) {
-                int consumption_rate;
+                unsigned int consumption_rate;
             if (k == 0) {
                 consumption_rate = (rand() % (max_consumption - amount_lower)) + amount_lower;
             } else {
@@ -56,20 +56,19 @@ void generate_test(int testnumber, int amount_servers, int amount_demands, int m
         int demand = rand() % (total_amount_servers + 1);
         demands.push_back(demand);
     }
-    for(auto it_demands = demands.begin(); it_demands != demands.end(); ++it_demands)
-    {
-        file << *it_demands << " ";
+    for (unsigned int &demand : demands) {
+        file << demand << " ";
     }
-    for(auto it_servers = servers.begin(); it_servers != servers.end(); ++it_servers) {
+    for (auto &server : servers) {
         file << std::endl;
-        file << it_servers->amount_servers << " " << it_servers->transition_costs.size() << std::endl;
-        for(auto it_transition_costs = it_servers->transition_costs.begin(); it_transition_costs != it_servers->transition_costs.end(); ++it_transition_costs) {
-         file << *it_transition_costs << " ";
+        file << server.amount_servers << " " << server.transition_costs.size() << std::endl;
+        for (unsigned long &transition_cost : server.transition_costs) {
+         file << transition_cost << " ";
         }
-        for(auto it_consumption_rates = it_servers->consumption_rate.begin(); it_consumption_rates != it_servers->consumption_rate.end(); ++it_consumption_rates) {
+        for (auto &it_consumption_rates : server.consumption_rate) {
             file << std::endl;
-            for(auto it_consumption_rate = it_consumption_rates->begin(); it_consumption_rate != it_consumption_rates->end(); ++it_consumption_rate) {
-                file << *it_consumption_rate << " ";
+            for (unsigned long &it_consumption_rate : it_consumption_rates) {
+                file << it_consumption_rate << " ";
             }
         }
     }
