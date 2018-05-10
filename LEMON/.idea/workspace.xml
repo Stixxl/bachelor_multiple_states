@@ -37,8 +37,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="395">
-              <caret line="621" column="49" lean-forward="true" selection-start-line="621" selection-start-column="49" selection-end-line="621" selection-end-column="49" />
+            <state relative-caret-position="515">
+              <caret line="639" column="8" selection-start-line="639" selection-start-column="8" selection-end-line="639" selection-end-column="8" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -150,20 +150,20 @@
       <workItem from="1525685036592" duration="10554000" />
       <workItem from="1525707611444" duration="7384000" />
       <workItem from="1525767881958" duration="16823000" />
-      <workItem from="1525857477775" duration="12045000" />
+      <workItem from="1525857477775" duration="23259000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="102140000" />
+    <option name="totallyTimeSpent" value="113354000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="29" width="1920" height="1051" extended-state="0" />
+    <frame x="-2" y="-18" width="1924" height="1100" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.010960334" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.0109375" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info active="true" anchor="bottom" id="CMake" order="7" visible="true" weight="0.2827225" />
+      <window_info active="true" anchor="bottom" id="CMake" order="7" visible="true" weight="0.2689243" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.312749" />
@@ -460,8 +460,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="395">
-          <caret line="621" column="49" lean-forward="true" selection-start-line="621" selection-start-column="49" selection-end-line="621" selection-end-column="49" />
+        <state relative-caret-position="515">
+          <caret line="639" column="8" selection-start-line="639" selection-start-column="8" selection-end-line="639" selection-end-column="8" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
