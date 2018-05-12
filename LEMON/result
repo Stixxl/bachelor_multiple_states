@@ -1,50 +1,26 @@
-1 & 37 & 62 & \SI{20}{\nano\second} & \SI{1256}{\nano\second} & \SI{1276}{\nano\second}\\
+1 & 37 & 62 & \SI{16459}{\nano\second} & \SI{1353410}{\nano\second} & \SI{1369869}{\nano\second}\\
 \hline
-2 & 76 & 149 & \SI{27}{\nano\second} & \SI{3443}{\nano\second} & \SI{3470}{\nano\second}\\
+2 & 76 & 149 & \SI{28980}{\nano\second} & \SI{3416796}{\nano\second} & \SI{3445776}{\nano\second}\\
 \hline
-3 & 97 & 197 & \SI{30}{\nano\second} & \SI{4667}{\nano\second} & \SI{4697}{\nano\second}\\
+3 & 97 & 197 & \SI{30720}{\nano\second} & \SI{4748359}{\nano\second} & \SI{4779079}{\nano\second}\\
 \hline
-4 & 185 & 409 & \SI{52}{\nano\second} & \SI{14631}{\nano\second} & \SI{14683}{\nano\second}\\
+4 & 185 & 409 & \SI{51112}{\nano\second} & \SI{14596169}{\nano\second} & \SI{14647281}{\nano\second}\\
 \hline
-5 & 888 & 2228 & \SI{211}{\nano\second} & \SI{317188}{\nano\second} & \SI{317399}{\nano\second}\\
+5 & 888 & 2228 & \SI{209833}{\nano\second} & \SI{321812803}{\nano\second} & \SI{322022636}{\nano\second}\\
 \hline
-1 & 37 & 62 & \SI{17}{\nano\second} & \SI{1261}{\nano\second} & \SI{1278}{\nano\second}\\
+6 & 993 & 2518 & \SI{249538}{\nano\second} & \SI{388519093}{\nano\second} & \SI{388768631}{\nano\second}\\
 \hline
-2 & 76 & 149 & \SI{37}{\nano\second} & \SI{4308}{\nano\second} & \SI{4345}{\nano\second}\\
+7 & 12084 & 32919 & \SI{3802618}{\nano\second} & \SI{76948750795}{\nano\second} & \SI{76952553413}{\nano\second}\\
 \hline
-3 & 97 & 197 & \SI{32}{\nano\second} & \SI{4672}{\nano\second} & \SI{4704}{\nano\second}\\
+8 & 14121 & 39164 & \SI{4007516}{\nano\second} & \SI{117292469268}{\nano\second} & \SI{117296476784}{\nano\second}\\
 \hline
-4 & 185 & 409 & \SI{51}{\nano\second} & \SI{14383}{\nano\second} & \SI{14434}{\nano\second}\\
+9 & 5095 & 13814 & \SI{1241521}{\nano\second} & \SI{11344279416}{\nano\second} & \SI{11345520937}{\nano\second}\\
 \hline
-5 & 888 & 2228 & \SI{213}{\nano\second} & \SI{321433}{\nano\second} & \SI{321646}{\nano\second}\\
+10 & 9113 & 25378 & \SI{2315874}{\nano\second} & \SI{37754198046}{\nano\second} & \SI{37756513920}{\nano\second}\\
 \hline
-6 & 993 & 2518 & \SI{239}{\nano\second} & \SI{388004}{\nano\second} & \SI{388243}{\nano\second}\\
+11 & 16810 & 46709 & \SI{4622217}{\nano\second} & \SI{172741380511}{\nano\second} & \SI{172746002728}{\nano\second}\\
 \hline
-7 & 12084 & 32919 & \SI{3863}{\nano\second} & \SI{75444025}{\nano\second} & \SI{75447888}{\nano\second}\\
+12 & 27247 & 77285 & \SI{7755541}{\nano\second} & \SI{529865956357}{\nano\second} & \SI{529873711898}{\nano\second}\\
 \hline
-8 & 14121 & 39164 & \SI{4145}{\nano\second} & \SI{116307454}{\nano\second} & \SI{116311599}{\nano\second}\\
-\hline
-9 & 5095 & 13814 & \SI{1168}{\nano\second} & \SI{11250027}{\nano\second} & \SI{11251195}{\nano\second}\\
-\hline
-10 & 9113 & 25378 & \SI{2321}{\nano\second} & \SI{37729142}{\nano\second} & \SI{37731463}{\nano\second}\\
-\hline
-1 & 37 & 62 & \SI{17}{\nano\second} & \SI{1445}{\nano\second} & \SI{1462}{\nano\second}\\
-\hline
-2 & 76 & 149 & \SI{27}{\nano\second} & \SI{3425}{\nano\second} & \SI{3452}{\nano\second}\\
-\hline
-3 & 97 & 197 & \SI{31}{\nano\second} & \SI{4816}{\nano\second} & \SI{4847}{\nano\second}\\
-\hline
-4 & 185 & 409 & \SI{76}{\nano\second} & \SI{14895}{\nano\second} & \SI{14971}{\nano\second}\\
-\hline
-5 & 888 & 2228 & \SI{338}{\nano\second} & \SI{320241}{\nano\second} & \SI{320579}{\nano\second}\\
-\hline
-1 & 37 & 62 & \SI{17175}{\nano\second} & \SI{1239783}{\nano\second} & \SI{1256958}{\nano\second}\\
-\hline
-2 & 76 & 149 & \SI{27274}{\nano\second} & \SI{3390636}{\nano\second} & \SI{3417910}{\nano\second}\\
-\hline
-3 & 97 & 197 & \SI{29971}{\nano\second} & \SI{4689142}{\nano\second} & \SI{4719113}{\nano\second}\\
-\hline
-4 & 185 & 409 & \SI{51598}{\nano\second} & \SI{14544104}{\nano\second} & \SI{14595702}{\nano\second}\\
-\hline
-5 & 888 & 2228 & \SI{210900}{\nano\second} & \SI{315027984}{\nano\second} & \SI{315238884}{\nano\second}\\
+13 & 5850 & 16186 & \SI{1582656}{\nano\second} & \SI{15731930846}{\nano\second} & \SI{15733513502}{\nano\second}\\
 \hline

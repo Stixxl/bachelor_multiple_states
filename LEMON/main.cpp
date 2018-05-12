@@ -255,7 +255,6 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
         Server current = servers[server_counter];
         unsigned long sigma = current.transition_costs.size();
         unsigned long u_k = vertices_counter;
-        cout << "u_k: " << u_k << std::endl;
         unsigned long u_k1 = vertices_counter + 1 + 2 * sigma;
         SmartDigraph::Arc edge = ae(g.nodeFromId(u_k), g.nodeFromId(u_k1));
         if (edge == INVALID) {
@@ -267,7 +266,6 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
             //found end of valley
             if (flow[edge] > prior_flow && is_decreasing) {
                 //find smallest lower path that routes flow
-                cout << "found end of valley" << std::endl;
                 unsigned long l_k = valley_start + 1;
                 for (int i = 0; i != sigma; ++i) {
                     SmartDigraph::Arc edge = ae(g.nodeFromId(u_k), g.nodeFromId(l_k));
@@ -307,7 +305,6 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
                 edge = ae(g.nodeFromId(u_k), g.nodeFromId(u_k1));
                 //found potential start of valley
             } else if (flow[edge] < prior_flow) {
-                cout << "found start of valley" << std::endl;
                 path_length = 1;
                 valley_start = u_k;
                 overflow = flow[edge] - floor(flow[edge]);
@@ -1038,7 +1035,6 @@ void read_test_file(const string &name, vector<Server> &servers, vector<unsigned
 }
 
 
-
 void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time_flow, string output) {
     srand(time(NULL));
     vector<Server> servers;
@@ -1104,14 +1100,14 @@ void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time
 
     cout << "Minimal Cost: " << min_cost << std::endl;
 
-    auto scale_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_scale-end_min_flow).count();
-    auto valley_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_valley-end_scale).count();
-    auto inc_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_inc-end_valley).count();
-    auto dec_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_dec-end_inc).count();
-    auto reduce_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_reduce-end_dec).count();
-    auto pack_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_pack-end_reduce).count();
-    auto generate_bench = chrono::duration_cast<std::chrono::nanoseconds>(start_flow-start).count();
-    auto flow_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_min_flow-start_flow).count();
+    auto scale_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_scale - end_min_flow).count();
+    auto valley_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_valley - end_scale).count();
+    auto inc_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_inc - end_valley).count();
+    auto dec_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_dec - end_inc).count();
+    auto reduce_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_reduce - end_dec).count();
+    auto pack_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_pack - end_reduce).count();
+    auto generate_bench = chrono::duration_cast<std::chrono::nanoseconds>(start_flow - start).count();
+    auto flow_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_min_flow - start_flow).count();
     uint64_t bench = generate_bench + flow_bench;
     generate += generate_bench;
     time_flow += flow_bench;
@@ -1123,12 +1119,15 @@ void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time
          << "\\SI{" << bench << "}{\\nano\\second}\\\\" << std::endl;
     file << "\\hline" << std::endl;
     file_rounding << (filenumber + 1) << " & " << amount_nodes << " & " << amount_edges << " & ";
-    file_rounding << "\\SI{" << scale_bench << "}{\\nano\\second} & " << "\\SI{" << valley_bench << "}{\\nano\\second} & "
-         << "\\SI{" << inc_bench << "}{\\nano\\second} &" << "\\SI{" << dec_bench << "}{\\nano\\second} & " << "\\SI{" << reduce_bench << "}{\\nano\\second} & ";
+    file_rounding << "\\SI{" << scale_bench << "}{\\nano\\second} & " << "\\SI{" << valley_bench
+                  << "}{\\nano\\second} & "
+                  << "\\SI{" << inc_bench << "}{\\nano\\second} &" << "\\SI{" << dec_bench << "}{\\nano\\second} & "
+                  << "\\SI{" << reduce_bench << "}{\\nano\\second} & ";
     file_rounding << "\\SI{" << pack_bench << "}{\\nano\\second}\\\\" << std::endl;
     file_rounding << "\\hline" << std::endl;
     data_file << generate_bench << " & " << flow_bench << " & " << bench << "\\\\" << std::endl;
-    data_file_rounding << scale_bench << " & " << valley_bench << " & " << inc_bench << " & " << dec_bench << " & " << reduce_bench << " & " << pack_bench << "\\\\" << std::endl;
+    data_file_rounding << scale_bench << " & " << valley_bench << " & " << inc_bench << " & " << dec_bench << " & "
+                       << reduce_bench << " & " << pack_bench << "\\\\" << std::endl;
     file.close();
     file_rounding.close();
     data_file.close();
