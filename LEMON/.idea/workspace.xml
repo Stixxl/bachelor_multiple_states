@@ -37,8 +37,8 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1989">
-              <caret line="891" column="13" lean-forward="true" selection-start-line="891" selection-start-column="13" selection-end-line="891" selection-end-column="13" />
+            <state relative-caret-position="540">
+              <caret line="1095" column="118" selection-start-line="1095" selection-start-column="118" selection-end-line="1095" selection-end-column="118" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -64,9 +64,11 @@
       <find>glpk</find>
       <find>currenttransition_costs.size()</find>
       <find>l</find>
+      <find>findArc</find>
     </findStrings>
     <replaceStrings>
       <replace>long</replace>
+      <replace>ae(</replace>
     </replaceStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -151,12 +153,12 @@
       <workItem from="1525685036592" duration="10554000" />
       <workItem from="1525707611444" duration="7384000" />
       <workItem from="1525767881958" duration="16823000" />
-      <workItem from="1525857477775" duration="35318000" />
+      <workItem from="1525857477775" duration="57482000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="125413000" />
+    <option name="totallyTimeSpent" value="147577000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-2" y="-18" width="1924" height="1100" extended-state="0" />
@@ -461,8 +463,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1989">
-          <caret line="891" column="13" lean-forward="true" selection-start-line="891" selection-start-column="13" selection-end-line="891" selection-end-column="13" />
+        <state relative-caret-position="540">
+          <caret line="1095" column="118" selection-start-line="1095" selection-start-column="118" selection-end-line="1095" selection-end-column="118" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
