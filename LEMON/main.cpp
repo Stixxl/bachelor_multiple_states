@@ -10,6 +10,7 @@
 
 #include<ctime>
 #include<sys/timeb.h>
+#include <chrono>
 #include<cinttypes>
 #include<limits>
 
@@ -254,6 +255,7 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
         Server current = servers[server_counter];
         unsigned long sigma = current.transition_costs.size();
         unsigned long u_k = vertices_counter;
+        cout << "u_k: " << u_k << std::endl;
         unsigned long u_k1 = vertices_counter + 1 + 2 * sigma;
         SmartDigraph::Arc edge = ae(g.nodeFromId(u_k), g.nodeFromId(u_k1));
         if (edge == INVALID) {
@@ -265,6 +267,7 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
             //found end of valley
             if (flow[edge] > prior_flow && is_decreasing) {
                 //find smallest lower path that routes flow
+                cout << "found end of valley" << std::endl;
                 unsigned long l_k = valley_start + 1;
                 for (int i = 0; i != sigma; ++i) {
                     SmartDigraph::Arc edge = ae(g.nodeFromId(u_k), g.nodeFromId(l_k));
@@ -304,12 +307,15 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
                 edge = ae(g.nodeFromId(u_k), g.nodeFromId(u_k1));
                 //found potential start of valley
             } else if (flow[edge] < prior_flow) {
+                cout << "found start of valley" << std::endl;
                 path_length = 1;
                 valley_start = u_k;
                 overflow = flow[edge] - floor(flow[edge]);
                 //we only need to round flow on a valley if flow is fractional on them
                 is_decreasing = overflow > 0.0;
+                vertices_counter += 1 + 2 * sigma;
             } else {
+                vertices_counter += 1 + 2 * sigma;
                 path_length++;
             }
         }
@@ -449,7 +455,7 @@ void round_flow_dec(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, 
                         unsigned long l_ak_pred = l_k_pred + 1;
                         //remove flow from upper path
                         SmartDigraph::Arc power_down = ae(g.nodeFromId(u_k), g.nodeFromId(l_k));
-                        overflow = min(, flow[power_down]);
+                        overflow = min(delta, flow[power_down]);
                         flow[upper] -= overflow;
                         //route flow to lower path
                         flow[power_down] -= overflow;
@@ -790,9 +796,6 @@ void reduce_to_m(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
             vertices_counter += 1 + 2 * sigma;
         }
     }
-
-}
-
 }
 
 void pack_flow(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, const unsigned long amnt_timesteps,
@@ -857,7 +860,7 @@ void pack_flow(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, const
                 lower_paths = lower_flow_end;
             }
             unsigned long cheapest_path = l_k;
-            unsigned long min_cost = numeric_limits<double>::max();
+            double min_cost = numeric_limits<double>::max();
             for (const unsigned long &j : lower_paths) {
                 l_k = j;
                 SmartDigraph::Arc power_down = ae(g.nodeFromId(valley_start), g.nodeFromId(l_k));
@@ -900,7 +903,7 @@ double mcmcf(bool is_debug, const SmartDigraph &g, const SmartDigraph::ArcMap<un
              const SmartDigraph::ArcMap<unsigned long> &capacity1,
              const SmartDigraph::ArcMap<unsigned long> &capacity2, SmartDigraph::ArcMap<unsigned long> &cost,
              SmartDigraph::NodeMap<long> &imbalances1,
-             SmartDigraph::NodeMap<long> &imbalances2, Lp &lp, SmartDigraph::ArcMap<Lp::Col> f1) {
+             SmartDigraph::NodeMap<long> &imbalances2, Lp &lp, SmartDigraph::ArcMap<Lp::Col> &f1) {
     // Create an instance of the default LP solver
     // Add a column to the problem for each arc
     SmartDigraph::ArcMap<Lp::Col> f2(g);
@@ -1034,11 +1037,7 @@ void read_test_file(const string &name, vector<Server> &servers, vector<unsigned
     } else cout << "Unable to open file " << name;
 }
 
-uint64_t getTimeNow() {
-    timespec ts{};
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return (uint64_t) ts.tv_sec * 1000000LL + (uint64_t) ts.tv_nsec / 1000LL;
-}
+
 
 void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time_flow, string output) {
     srand(time(NULL));
@@ -1046,9 +1045,13 @@ void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time
     vector<unsigned long> demands;
     read_test_file("tests/test_" + to_string(filenumber), servers, demands);
     ofstream file;
+    ofstream file_rounding;
+    ofstream data_file_rounding;
     ofstream data_file;
     file.open(output, std::ios_base::app);
     data_file.open(output + "_data", std::ios_base::app);
+    file_rounding.open(output + "_rounding", std::ios_base::app);
+    data_file_rounding.open(output + "_data_rounding", std::ios_base::app);
     long amount_nodes = 2 * (demands.size() + 1);
     long amount_edges = 0;
 
@@ -1067,36 +1070,48 @@ void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time
     SmartDigraph::ArcMap<unsigned long> capacity2(g);
     SmartDigraph::ArcMap<unsigned long> cost(g);
     SmartDigraph::ArcMap<double> flow(g);
-    ArcLookUp<SmartDigraph> ae(g);
 
     Lp lp;
     SmartDigraph::ArcMap<Lp::Col> f1(g);
 
-    uint64_t start = getTimeNow();
+    auto start = chrono::high_resolution_clock::now();
     generate_graph(g, imbalances1, imbalances2, cost, capacity, capacity1, capacity2, servers, demands);
-    uint64_t start_flow = getTimeNow();
+    auto start_flow = chrono::high_resolution_clock::now();
 
     double min_cost = mcmcf(is_debug, g, capacity, capacity1, capacity2, cost, imbalances1, imbalances2, lp, f1);
-    uint64_t end_min_flow = getTimeNow();
+    auto end_min_flow = chrono::high_resolution_clock::now();
+
+    ArcLookUp<SmartDigraph> ae(g);
+    //ae.refresh();
+    cout << "Starting Scaling" << std::endl;
     scale_flow(servers.size(), g, capacity1, flow, imbalances1, f1, lp);
-    uint64_t end_scale = getTimeNow();
+    auto end_scale = chrono::high_resolution_clock::now();
+    cout << "Starting Valleys" << std::endl;
     round_flow_valley(ae, servers, demands.size(), g, flow);
-    uint64_t end_valley = getTimeNow();
+    auto end_valley = chrono::high_resolution_clock::now();
+    cout << "Starting Increasing" << std::endl;
     round_flow_inc(ae, servers, demands.size(), g, flow);
-    uint64_t end_inc = getTimeNow();
+    auto end_inc = chrono::high_resolution_clock::now();
+    cout << "Starting Decreasing" << std::endl;
     round_flow_dec(ae, servers, demands.size(), g, flow);
-    uint64_t end_dec = getTimeNow();
+    auto end_dec = chrono::high_resolution_clock::now();
+    cout << "Starting Reducing" << std::endl;
     reduce_to_m(ae, servers, demands.size(), g, capacity1, flow);
-    uint64_t end_reduce = getTimeNow();
-    pack_flow(ae,servers, demands.size(), g, cost, flow);
-    uint64_t end_pack = getTimeNow();
+    auto end_reduce = chrono::high_resolution_clock::now();
+    cout << "Starting Packing" << std::endl;
+    pack_flow(ae, servers, demands.size(), g, cost, flow);
+    auto end_pack = chrono::high_resolution_clock::now();
 
     cout << "Minimal Cost: " << min_cost << std::endl;
 
-    cout << end_scale <<" " << end_valley << " " << end_inc << " " << end_dec << " " << end_reduce << " " << end_pack;
-
-    uint64_t generate_bench = (start_flow - start);
-    uint64_t flow_bench = (end_min_flow - start_flow);
+    auto scale_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_scale-end_min_flow).count();
+    auto valley_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_valley-end_scale).count();
+    auto inc_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_inc-end_valley).count();
+    auto dec_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_dec-end_inc).count();
+    auto reduce_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_reduce-end_dec).count();
+    auto pack_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_pack-end_reduce).count();
+    auto generate_bench = chrono::duration_cast<std::chrono::nanoseconds>(start_flow-start).count();
+    auto flow_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_min_flow-start_flow).count();
     uint64_t bench = generate_bench + flow_bench;
     generate += generate_bench;
     time_flow += flow_bench;
@@ -1107,8 +1122,17 @@ void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time
     file << "\\SI{" << generate_bench << "}{\\nano\\second} & " << "\\SI{" << flow_bench << "}{\\nano\\second} & "
          << "\\SI{" << bench << "}{\\nano\\second}\\\\" << std::endl;
     file << "\\hline" << std::endl;
+    file_rounding << (filenumber + 1) << " & " << amount_nodes << " & " << amount_edges << " & ";
+    file_rounding << "\\SI{" << scale_bench << "}{\\nano\\second} & " << "\\SI{" << valley_bench << "}{\\nano\\second} & "
+         << "\\SI{" << inc_bench << "}{\\nano\\second} &" << "\\SI{" << dec_bench << "}{\\nano\\second} & " << "\\SI{" << reduce_bench << "}{\\nano\\second} & ";
+    file_rounding << "\\SI{" << pack_bench << "}{\\nano\\second}\\\\" << std::endl;
+    file_rounding << "\\hline" << std::endl;
     data_file << generate_bench << " & " << flow_bench << " & " << bench << "\\\\" << std::endl;
+    data_file_rounding << scale_bench << " & " << valley_bench << " & " << inc_bench << " & " << dec_bench << " & " << reduce_bench << " & " << pack_bench << "\\\\" << std::endl;
     file.close();
+    file_rounding.close();
+    data_file.close();
+    data_file_rounding.close();
 }
 
 int main(int argc, char *argv[]) {
