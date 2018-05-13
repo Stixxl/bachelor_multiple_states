@@ -281,7 +281,7 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
                 u_k = valley_start;
                 u_k1 = valley_start + 1 + 2 * sigma;
                 unsigned long l_ak = l_k + 1;
-                unsigned long l_k1 = l_k + 2 * sigma;
+                unsigned long l_k1 = l_k + 2 * sigma + 1;
                 for (int i = 0; i != path_length; ++i) {
                     //remove flow from upper path
                     SmartDigraph::Arc upper = ae(g.nodeFromId(u_k), g.nodeFromId(u_k1));
@@ -304,13 +304,6 @@ void round_flow_valley(ArcLookUp<SmartDigraph> &ae, const vector<Server> &server
                 vertices_counter = u_k1;
                 edge = ae(g.nodeFromId(u_k), g.nodeFromId(u_k1));
                 //found potential start of valley
-            } else if (flow[edge] < prior_flow) {
-                path_length = 1;
-                valley_start = u_k;
-                overflow = flow[edge] - floor(flow[edge]);
-                //we only need to round flow on a valley if flow is fractional on them
-                is_decreasing = overflow > 0.0;
-                vertices_counter += 1 + 2 * sigma;
             } else {
                 vertices_counter += 1 + 2 * sigma;
                 path_length++;
@@ -369,7 +362,7 @@ void round_flow_inc(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, 
                             }
                         }
                         unsigned long l_ak = l_k + 1;
-                        unsigned long l_k1 = l_k + 2 * sigma;
+                        unsigned long l_k1 = l_k + 2 * sigma + 1;
                         SmartDigraph::Arc power_up = ae(g.nodeFromId(l_k), g.nodeFromId(u_k));
                         overflow = min(delta, flow[power_up]);
                         flow[upper] -= overflow;
@@ -521,7 +514,7 @@ void round_peaks(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
                     j1--;
                 }
             }
-            unsigned long l_k1 = u_k1 + 2 * sigma - 1;
+            unsigned long l_k1 = u_k1 + 2 * sigma +1;
             int j2 = sigma;
             for (int i = 0; i != sigma; ++i) {
                 SmartDigraph::Arc edge = ae(g.nodeFromId(u_k), g.nodeFromId(l_k));
@@ -647,9 +640,10 @@ void reduce_to_m(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
                 if (flow[upper] > flow[next_upper] ||
                     (ae(g.nodeFromId(u_k2), g.nodeFromId(u_k2 + 1 + 2 * sigma)) == INVALID &&
                      flow[next_upper] > 0)) {
-                    unsigned long l_k = u_k + 2 * sigma;
-                    int j1 = sigma;
-                    for (int i = 0; i != sigma; ++i) {
+                    cout << "handling peak" << std::endl;
+                    unsigned long l_k = u_k + 2 * sigma - 1;
+                    int j1 = sigma-1;
+                    for (int i = 0; i != sigma - 2; ++i) {
                         SmartDigraph::Arc edge = ae(g.nodeFromId(l_k), g.nodeFromId(u_k));
                         if (flow[edge] > 0.0) {
                             break;
@@ -658,9 +652,9 @@ void reduce_to_m(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
                             j1--;
                         }
                     }
-                    unsigned long l_k1 = u_k1 + 2 * sigma;
-                    int j2 = sigma;
-                    for (int i = 0; i != sigma; ++i) {
+                    unsigned long l_k1 = u_k1 + 2 * sigma - 1;
+                    int j2 = sigma - 1;
+                    for (int i = 0; i != sigma - 2; ++i) {
                         SmartDigraph::Arc edge = ae(g.nodeFromId(u_k), g.nodeFromId(l_k));
                         if (flow[edge] > 0.0) {
                             break;
@@ -677,9 +671,11 @@ void reduce_to_m(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
                                 max(flow[next_upper], (double) servers[server_counter].amount_servers);
                     }
                     while (flow[upper] > (double) servers[server_counter].amount_servers) {
+
                         SmartDigraph::Arc power_up = ae(g.nodeFromId(l_k), g.nodeFromId(u_k));
                         SmartDigraph::Arc power_down = ae(g.nodeFromId(u_k1), g.nodeFromId(l_k1));
                         if (j1 == j2) {
+                            cout << "j1: " << j1 << ", l_k: " << l_k << ", u_k: " << u_k << std::endl;
                             double overflow = min(delta, flow[power_up]);
                             overflow = min(overflow, flow[power_down]);
                             flow[upper] -= overflow;
@@ -691,7 +687,7 @@ void reduce_to_m(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
                             flow[lower] += overflow;
                             flow[lower1] += overflow;
                         } else {
-                            double overflow = flow[upper] - floor(flow[upper]);
+                            double overflow = delta;
                             unsigned long l_k_pred = l_k - 2 * sigma - 1;
                             SmartDigraph::Arc edge = ae(g.nodeFromId(l_k_pred), g.nodeFromId(l_k));
                             while (edge != INVALID && flow[edge] > 0.0) {
@@ -764,17 +760,19 @@ void reduce_to_m(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
                 }
                 //round flow like increasing edges
                 while (flow[upper] > (double) servers[server_counter].amount_servers) {
-                    unsigned long l_k = u_k + 2 * (sigma - 1);
-                    for (int i = 0; i != servers[server_counter].transition_costs.size(); ++i) {
+                    unsigned long l_k = u_k + 2 * sigma - 1;
+                    unsigned long j = sigma;
+                    for (int i = 0; i != sigma - 2; ++i) {
                         SmartDigraph::Arc edge = ae(g.nodeFromId(l_k), g.nodeFromId(u_k));
                         if (flow[edge] > 0.0) {
                             break;
                         } else {
+                            j--;
                             l_k -= 2;
                         }
                     }
                     unsigned long l_ak = l_k + 1;
-                    unsigned long l_k1 = l_k + 2 * sigma;
+                    unsigned long l_k1 = l_k + 2 * sigma + 1;
                     SmartDigraph::Arc power_up = ae(g.nodeFromId(l_k), g.nodeFromId(u_k));
                     double overflow = min(flow[upper] - (double) servers[server_counter].amount_servers,
                                           flow[power_up]);
@@ -790,6 +788,7 @@ void reduce_to_m(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, con
                     flow[power_up1] += overflow;
                 }
             }
+            outer:;
             vertices_counter += 1 + 2 * sigma;
         }
     }
@@ -891,8 +890,11 @@ void pack_flow(ArcLookUp<SmartDigraph> &ae, const vector<Server> &servers, const
             }
             SmartDigraph::Arc power_up = ae(g.nodeFromId(l_k), g.nodeFromId(valley_end));
             aux_flow[power_up] += delta;
-
+            vertices_counter = first_server;
         }
+    }
+    for(SmartDigraph::ArcIt a(g); a != INVALID; ++a) {
+        flow[a] = max(flow[a], aux_flow[a]);
     }
 }
 
@@ -1035,6 +1037,7 @@ void read_test_file(const string &name, vector<Server> &servers, vector<unsigned
 }
 
 
+
 void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time_flow, string output) {
     srand(time(NULL));
     vector<Server> servers;
@@ -1091,6 +1094,9 @@ void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time
     cout << "Starting Decreasing" << std::endl;
     round_flow_dec(ae, servers, demands.size(), g, flow);
     auto end_dec = chrono::high_resolution_clock::now();
+    cout << "Starting peaks" << std::endl;
+    round_peaks(ae,servers, demands.size(), g, flow);
+    auto end_peaks = chrono::high_resolution_clock::now();
     cout << "Starting Reducing" << std::endl;
     reduce_to_m(ae, servers, demands.size(), g, capacity1, flow);
     auto end_reduce = chrono::high_resolution_clock::now();
@@ -1100,34 +1106,30 @@ void benchmark(bool is_debug, int filenumber, uint64_t &generate, uint64_t &time
 
     cout << "Minimal Cost: " << min_cost << std::endl;
 
-    auto scale_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_scale - end_min_flow).count();
-    auto valley_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_valley - end_scale).count();
-    auto inc_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_inc - end_valley).count();
-    auto dec_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_dec - end_inc).count();
-    auto reduce_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_reduce - end_dec).count();
-    auto pack_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_pack - end_reduce).count();
-    auto generate_bench = chrono::duration_cast<std::chrono::nanoseconds>(start_flow - start).count();
-    auto flow_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_min_flow - start_flow).count();
+    auto scale_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_scale-end_min_flow).count();
+    auto valley_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_valley-end_scale).count();
+    auto inc_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_inc-end_valley).count();
+    auto dec_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_dec-end_inc).count();
+    auto peak_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_peaks-end_dec).count();
+    auto reduce_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_reduce-end_peaks).count();
+    auto pack_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_pack-end_reduce).count();
+    auto generate_bench = chrono::duration_cast<std::chrono::nanoseconds>(start_flow-start).count();
+    auto flow_bench = chrono::duration_cast<std::chrono::nanoseconds>(end_min_flow-start_flow).count();
     uint64_t bench = generate_bench + flow_bench;
     generate += generate_bench;
     time_flow += flow_bench;
-    printf("Generating the graph took %" PRIu64 " nanoseconds.\n", generate_bench);
-    printf("Executing mcmcf took %" PRIu64 " nanoseconds.\n", flow_bench);
-    printf("Overall time required was %" PRIu64 " nanoseconds.\n", bench);
     file << (filenumber + 1) << " & " << amount_nodes << " & " << amount_edges << " & ";
     file << "\\SI{" << generate_bench << "}{\\nano\\second} & " << "\\SI{" << flow_bench << "}{\\nano\\second} & "
          << "\\SI{" << bench << "}{\\nano\\second}\\\\" << std::endl;
     file << "\\hline" << std::endl;
     file_rounding << (filenumber + 1) << " & " << amount_nodes << " & " << amount_edges << " & ";
-    file_rounding << "\\SI{" << scale_bench << "}{\\nano\\second} & " << "\\SI{" << valley_bench
-                  << "}{\\nano\\second} & "
-                  << "\\SI{" << inc_bench << "}{\\nano\\second} &" << "\\SI{" << dec_bench << "}{\\nano\\second} & "
-                  << "\\SI{" << reduce_bench << "}{\\nano\\second} & ";
-    file_rounding << "\\SI{" << pack_bench << "}{\\nano\\second}\\\\" << std::endl;
+    file_rounding << "\\SI{" << scale_bench << "}{\\nano\\second} & " << "\\SI{" << valley_bench << "}{\\nano\\second} & "
+         << "\\SI{" << inc_bench << "}{\\nano\\second} &" << "\\SI{" << dec_bench << "}{\\nano\\second} & " << "\\SI{" << peak_bench << "}{\\nano\\second} & ";
+    file_rounding << "\\SI{" << reduce_bench << "}{\\nano\\second} & " << "\\SI{" << pack_bench << "}{\\nano\\second}\\\\" << std::endl;
     file_rounding << "\\hline" << std::endl;
     data_file << generate_bench << " & " << flow_bench << " & " << bench << "\\\\" << std::endl;
-    data_file_rounding << scale_bench << " & " << valley_bench << " & " << inc_bench << " & " << dec_bench << " & "
-                       << reduce_bench << " & " << pack_bench << "\\\\" << std::endl;
+    data_file_rounding << scale_bench << " & " << valley_bench << " & " << inc_bench << " & " << dec_bench << " & " << peak_bench << " & " << reduce_bench << " & " << pack_bench << "\\\\" << std::endl;
+
     file.close();
     file_rounding.close();
     data_file.close();
@@ -1169,14 +1171,12 @@ int main(int argc, char *argv[]) {
     uint64_t flow = 0;
     for (int i = 0; i != amount_tests; ++i) {
         printf("running test %d\n", i);
-        benchmark(true, i, generate, flow, "results/result");
+        benchmark(false, i, generate, flow, "results/result");
     }
 
     printf("Ran %d tests.\n", amount_tests);
     printf("Overall time required for generating the graph: %" PRIu64 " nanoseconds\n", generate);
-    printf("Overall time required for executing the simplex algorithm: %" PRIu64 " nanoseconds\n", flow);
+    printf("Overall time required for executing the mcmcf algorithm: %" PRIu64 " nanoseconds\n", flow);
     printf("Overall time required: %" PRIu64 " nanoseconds\n", generate + flow);
     return 0;
 }
-
-#pragma clang diagnostic pop
