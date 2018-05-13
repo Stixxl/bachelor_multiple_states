@@ -1,6 +1,0 @@
-[package]
-name = "multiple_states"
-version = "0.1.0"
-authors = ["Corbinian Stiglmair <corbinho@hotmail.de>"]
-
-[dependencies]

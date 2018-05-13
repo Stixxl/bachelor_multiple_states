@@ -191,7 +191,7 @@ void print_graph(const SmartDigraph &g, const SmartDigraph::ArcMap<unsigned long
                  SmartDigraph::NodeMap<long> &imbalances1,
                  SmartDigraph::NodeMap<long> &imbalances2) {
     ofstream file;
-    file.open("dot.gv");
+    file.open("results/dot.gv");
     file << "digraph G {" << std::endl;
     for (SmartDigraph::NodeIt a(g); a != INVALID; ++a) {
         file << g.id(a) << " [ xlabel=\"" << to_string(imbalances1[a]) << "/" << to_string(imbalances2[a]) << "\" ]"
@@ -1169,7 +1169,7 @@ int main(int argc, char *argv[]) {
     uint64_t flow = 0;
     for (int i = 0; i != amount_tests; ++i) {
         printf("running test %d\n", i);
-        benchmark(true, i, generate, flow, "result");
+        benchmark(true, i, generate, flow, "results/result");
     }
 
     printf("Ran %d tests.\n", amount_tests);
